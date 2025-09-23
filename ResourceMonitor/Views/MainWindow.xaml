@@ -2,18 +2,40 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:s="http://smart/windows"
+        xmlns:behaviors="clr-namespace:ResourceMonitor.Behaviors"
         xmlns:views="clr-namespace:ResourceMonitor.Views"
         mc:Ignorable="d"
         x:Class="ResourceMonitor.Views.MainWindow"
+        s:DataContextResolver.Type="{x:Type views:MainWindowViewModel}"
+        d:DataContext="{d:DesignInstance Type={x:Type views:MainWindowViewModel}}"
         Width="320"
         Height="800"
         Title="MainWindow"
+        ResizeMode="NoResize"
         ShowInTaskbar="False"
-        WindowStyle="None" ResizeMode="NoResize">
+        WindowStyle="None">
 
-    <Window.DataContext>
-        <views:MainWindowViewModel />
-    </Window.DataContext>
+    <i:Interaction.Behaviors>
+        <behaviors:WindowPlacementBehavior Placement="TopRight" />
+        <s:DragMoveBehavior />
+        <s:ContextMenuBehavior>
+            <s:ContextMenuBehavior.Menu>
+                <ContextMenu>
+                    <MenuItem Command="{Binding HideCommand}"
+                              Header="Hide" />
+                </ContextMenu>
+            </s:ContextMenuBehavior.Menu>
+        </s:ContextMenuBehavior>
+    </i:Interaction.Behaviors>
+    <i:Interaction.Triggers>
+        <s:EventRequestTrigger Request="{Binding HideRequest}">
+            <s:EventRequestTrigger.Actions>
+                <s:CallMethodAction MethodName="Hide" />
+            </s:EventRequestTrigger.Actions>
+        </s:EventRequestTrigger>
+    </i:Interaction.Triggers>
 
     <Grid />
 

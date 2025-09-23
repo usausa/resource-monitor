@@ -74,11 +74,15 @@ public sealed partial class App
     {
         // TODO
         var menu = new System.Windows.Forms.ContextMenuStrip();
+        var defaultItem = new ToolStripMenuItem("Show", null, OnShowClick);
+        defaultItem.Font = new Font(defaultItem.Font, System.Drawing.FontStyle.Bold);
+        menu.Items.Add(defaultItem);
+        menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add("Exit", null, OnExitClick);
         notifyIcon.Icon = new Icon("App.ico");
         notifyIcon.Text = "Booting";
         notifyIcon.ContextMenuStrip = menu;
-        notifyIcon.MouseDoubleClick += NotifyIconOnMouseDoubleClick;
+        notifyIcon.MouseDoubleClick += OnShowClick;
         notifyIcon.Visible = true;
 
         // TODO
@@ -88,7 +92,7 @@ public sealed partial class App
         await host.StartAsync().ConfigureAwait(false);
 
         // TODO log & visual effect ?
-        notifyIcon.Text = "Test";
+        notifyIcon.Text = "Monitoring";
 
         MainWindow.Show();
     }
@@ -117,7 +121,7 @@ public sealed partial class App
     // Handler
     //--------------------------------------------------------------------------------
 
-    private void NotifyIconOnMouseDoubleClick(object? sender, System.Windows.Forms.MouseEventArgs e)
+    private void OnShowClick(object? sender, EventArgs e)
     {
         MainWindow?.Show();
     }
