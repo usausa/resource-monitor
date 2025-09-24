@@ -6,10 +6,31 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>App.ico</ApplicationIcon>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <CodeAnalysisRuleSet>..\Analyzers.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.4" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+    <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="System.Interactive" Version="6.0.3" />
+    <PackageReference Include="System.Linq.Async" Version="6.0.3" />
+    <PackageReference Include="System.Reactive" Version="6.0.2" />
+    <PackageReference Include="Usa.Smart.Core" Version="2.4.6" />
+    <PackageReference Include="Usa.Smart.Reactive" Version="2.4.3" />
+    <PackageReference Include="Usa.Smart.Windows" Version="2.16.1" />
+    <PackageReference Include="Usa.Smart.Windows.Extensions" Version="2.16.1" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="App.ico">
@@ -28,31 +49,6 @@
       <DependentUpon>appsettings.json</DependentUpon>
       <ExcludeFromSingleFile>True</ExcludeFromSingleFile>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Remove="app.manifest" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
-    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
-    <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
-    <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
-    <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageReference Include="System.Interactive" Version="6.0.3" />
-    <PackageReference Include="System.Linq.Async" Version="6.0.3" />
-    <PackageReference Include="System.Reactive" Version="6.0.2" />
-    <PackageReference Include="Usa.Smart.Core" Version="2.4.6" />
-    <PackageReference Include="Usa.Smart.Reactive" Version="2.4.3" />
-    <PackageReference Include="Usa.Smart.Windows" Version="2.16.1" />
-    <PackageReference Include="Usa.Smart.Windows.Extensions" Version="2.16.1" />
   </ItemGroup>
 
 </Project>

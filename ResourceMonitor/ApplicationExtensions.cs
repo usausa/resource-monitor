@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using ResourceMonitor.Hubs;
 using ResourceMonitor.Views;
+using ResourceMonitor.Workers;
 
 using Serilog;
 
@@ -52,6 +53,7 @@ public static class ApplicationExtensions
     {
         // TODO
         // Services
+        builder.Services.AddHostedService<CollectWorker>();
 
         // Window
         builder.Services.AddSingleton<MainWindow>();
