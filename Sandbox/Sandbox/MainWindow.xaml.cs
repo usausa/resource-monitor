@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Sandbox
 {
@@ -16,9 +17,39 @@ namespace Sandbox
     /// </summary>
     public partial class MainWindow : Window
     {
+        private System.Threading.Timer _precisionTimer;
+
+        private readonly Random _random = new Random();
         public MainWindow()
         {
             InitializeComponent();
+
+            _precisionTimer = new System.Threading.Timer(
+                state =>
+                {
+                    // TODO stop or dispose
+
+                    // Update the UI on the dispatcher thread
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        // Simulate CPU usage between 15-35%
+                        double cpuValue = 15 + _random.NextDouble() * 75;
+                        CpuControl.Value = (float)cpuValue;
+
+                        // Simulate memory usage between 30-60%
+                        double memValue = 30 + _random.NextDouble() * 70;
+                        MemoryControl.Value = (float)memValue;
+                    });
+                },
+                null,
+                0,
+                500);
+
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            _precisionTimer.Dispose();
         }
     }
 }
