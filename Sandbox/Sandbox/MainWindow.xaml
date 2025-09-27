@@ -6,8 +6,8 @@
     xmlns:local="clr-namespace:Sandbox"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="MainWindow"
-    Width="800"
-    Height="450"
+    Width="320"
+    Height="240"
     Closing="Window_Closing"
     mc:Ignorable="d">
 
@@ -20,7 +20,7 @@
         <local:ResourceGraphControl
             x:Name="CpuControl"
             Grid.Row="0"
-            Margin="10,10,10,10"
+            Margin="4"
             FontSize="14"
             GraphColor="#6993f0"
             Label="CPU used"
@@ -29,7 +29,7 @@
         <local:ResourceGraphControl
             x:Name="MemoryControl"
             Grid.Row="1"
-            Margin="10,10,10,10"
+            Margin="4"
             FontSize="14"
             GraphColor="#69d0f0"
             Label="Memory used"

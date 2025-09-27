@@ -1,3 +1,4 @@
+using System.Reactive.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -60,16 +61,15 @@ namespace Sandbox
             //    });
             //};
 
-            disposable = SignalRClient.Observe<MonitorValues>("http://127.0.0.1:9980/monitor", "Receive", data =>
-            {
-                // TODO Disposed後のチェック
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    CpuControl.Value = data.CpuLoadTotal ?? 0;
-                    MemoryControl.Value = data.MemoryLoadPhysical ?? 0;
-                });
-            });
-            }
+            disposable = SignalRClient.CreateObservable<MonitorValues>("http://127.0.0.1:9980/monitor", "Receive", TimeSpan.FromSeconds(5))
+                    .ObserveOn(SynchronizationContext.Current!)
+                    .Subscribe(data =>
+                    {
+                        CpuControl.Value = data.CpuLoadTotal ?? 0;
+                        MemoryControl.Value = data.MemoryLoadPhysical ?? 0;
+                    });
+
+        }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

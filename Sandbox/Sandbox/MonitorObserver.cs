@@ -7,6 +7,8 @@ namespace Sandbox;
 
 using Microsoft.AspNetCore.SignalR.Client;
 
+using System;
+
 internal sealed class MonitorValues
 {
     public float? CpuLoadTotal { get; set; }
@@ -28,40 +30,46 @@ internal sealed class MonitorValues
     public float? MemoryLoadPhysical { get; set; }
 }
 
-internal static class SignalRClient
+internal static class ReactiveSignalR
 {
-    public static IDisposable Observe<T>(string uri, string methodName, Action<T> action)
+    public static IObservable<T> CreateObservable<T>(string uri, string methodName, TimeSpan retryInterval)
     {
-        var connection = new HubConnectionBuilder()
-            .WithUrl(uri)
-            .WithAutomaticReconnect(new FixedIntervalRetryPolicy(TimeSpan.FromSeconds(5)))
-            .Build();
-
-        // Receiveイベントの購読を設定
-        connection.On(methodName, action);
-
-        // 購読のためのCompositeDisposable
-        var disposable = new CompositeDisposable();
-        // キャンセレーショントークンソースの作成
-        var cts = new CancellationTokenSource();
-        disposable.Add(Disposable.Create(() => cts.Cancel()));
-        // 接続処理とリトライロジックの実装
-        disposable.Add(Observable.FromAsync(async () => await TryConnectWithRetryAsync(connection, cts.Token)).Subscribe());
-        // 接続のクリーンアップのための処理
-        disposable.Add(Disposable.Create(async () =>
+        return Observable.Create<T>(observer =>
         {
-            if (connection.State == HubConnectionState.Connected)
-            {
-                // ReSharper disable once MethodSupportsCancellation
-                await connection.StopAsync();
-            }
-            await connection.DisposeAsync();
-        }));
+            var connection = new HubConnectionBuilder()
+                .WithUrl(uri)
+                .WithAutomaticReconnect(new FixedIntervalRetryPolicy(retryInterval))
+                .Build();
 
-        return disposable;
+            // Receiveイベントの購読を設定
+            connection.On<T>(methodName, observer.OnNext);
+
+            // 購読のためのCompositeDisposable
+            var disposable = new CompositeDisposable();
+            // キャンセレーショントークンソースの作成
+            var cts = new CancellationTokenSource();
+            disposable.Add(Disposable.Create(() => cts.Cancel()));
+            // 接続処理とリトライロジックの実装
+            disposable.Add(Observable
+                .FromAsync(async () => await TryConnectWithRetryAsync(connection, retryInterval, cts.Token))
+                .Subscribe());
+            // 接続のクリーンアップのための処理
+            disposable.Add(Disposable.Create(async () =>
+            {
+                if (connection.State == HubConnectionState.Connected)
+                {
+                    // ReSharper disable once MethodSupportsCancellation
+                    await connection.StopAsync();
+                }
+
+                await connection.DisposeAsync();
+            }));
+
+            return disposable;
+        });
     }
 
-    private static async Task<bool> TryConnectWithRetryAsync(HubConnection connection, CancellationToken cancellationToken)
+    private static async Task<bool> TryConnectWithRetryAsync(HubConnection connection, TimeSpan retryInterval, CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -85,7 +93,7 @@ internal static class SignalRClient
                 try
                 {
                     // 接続失敗時、5秒後に再試行（キャンセル可能）
-                    await Task.Delay(5000, cancellationToken);
+                    await Task.Delay(retryInterval, cancellationToken);
                 }
                 catch (OperationCanceledException)
                 {
