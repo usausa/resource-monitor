@@ -3,7 +3,9 @@ namespace ResourceMonitor;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
+using ResourceMonitor.Events;
 using ResourceMonitor.Hubs;
+using ResourceMonitor.Processors;
 using ResourceMonitor.Views;
 using ResourceMonitor.Workers;
 
@@ -51,8 +53,16 @@ public static class ApplicationExtensions
 
     public static WebApplicationBuilder ConfigureComponents(this WebApplicationBuilder builder)
     {
-        // TODO
-        // Services
+        // TODO setting & processor & window size?
+
+        // EventBus
+        builder.Services.AddSingleton(EventBus.Default);
+
+        // Processors
+        builder.Services.AddSingleton<IValueProcessor, EventBusValueProcessor>();
+        builder.Services.AddSingleton<IValueProcessor, HubValueProcessor>();
+
+        // Workers
         builder.Services.AddHostedService<CollectWorker>();
 
         // Window

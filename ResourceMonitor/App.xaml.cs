@@ -72,8 +72,8 @@ public sealed partial class App
     // ReSharper disable once AsyncVoidEventHandlerMethod
     protected override async void OnStartup(StartupEventArgs e)
     {
-        // TODO
-        var menu = new System.Windows.Forms.ContextMenuStrip();
+        // Menu
+        var menu = new ContextMenuStrip();
         var defaultItem = new ToolStripMenuItem("Show", null, OnShowClick);
         defaultItem.Font = new Font(defaultItem.Font, System.Drawing.FontStyle.Bold);
         menu.Items.Add(defaultItem);
@@ -85,21 +85,22 @@ public sealed partial class App
         notifyIcon.MouseDoubleClick += OnShowClick;
         notifyIcon.Visible = true;
 
-        // TODO
+        // Window
         MainWindow = host.Services.GetRequiredService<MainWindow>();
 
-        // TODO slow ?
+        //  Start host
         await host.StartAsync().ConfigureAwait(false);
 
+        // Update
         // TODO log & visual effect ?
         notifyIcon.Text = "Monitoring";
-
         MainWindow.Show();
     }
 
     // ReSharper disable once AsyncVoidEventHandlerMethod
     protected override async void OnExit(ExitEventArgs e)
     {
+        // Stop host
         await host.StopAsync(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
         host.Dispose();
 
