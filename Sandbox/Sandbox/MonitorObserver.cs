@@ -30,7 +30,7 @@ internal sealed class MonitorValues
 
 internal static class SignalRClient
 {
-    public static IDisposable Observe(string uri, Action<MonitorValues> action)
+    public static IDisposable Observe<T>(string uri, string methodName, Action<T> action)
     {
         var connection = new HubConnectionBuilder()
             .WithUrl(uri)
@@ -38,22 +38,21 @@ internal static class SignalRClient
             .Build();
 
         // Receiveイベントの購読を設定
-        connection.On<MonitorValues>("Receive", action);
+        connection.On(methodName, action);
 
         // 購読のためのCompositeDisposable
         var disposable = new CompositeDisposable();
+        // キャンセレーショントークンソースの作成
+        var cts = new CancellationTokenSource();
+        disposable.Add(Disposable.Create(() => cts.Cancel()));
         // 接続処理とリトライロジックの実装
-        disposable.Add(Observable.FromAsync(async () =>
-            {
-                await TryConnectWithRetryAsync(connection);
-                return true;
-            })
-            .Subscribe());
+        disposable.Add(Observable.FromAsync(async () => await TryConnectWithRetryAsync(connection, cts.Token)).Subscribe());
         // 接続のクリーンアップのための処理
         disposable.Add(Disposable.Create(async () =>
         {
             if (connection.State == HubConnectionState.Connected)
             {
+                // ReSharper disable once MethodSupportsCancellation
                 await connection.StopAsync();
             }
             await connection.DisposeAsync();
@@ -62,23 +61,40 @@ internal static class SignalRClient
         return disposable;
     }
 
-    private static async Task TryConnectWithRetryAsync(HubConnection connection)
+    private static async Task<bool> TryConnectWithRetryAsync(HubConnection connection, CancellationToken cancellationToken)
     {
-        bool connected = false;
-
-        while (!connected)
+        while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
-                await connection.StartAsync();
-                connected = true;
+                await connection.StartAsync(cancellationToken);
+                return true;
+            }
+            catch (OperationCanceledException)
+            {
+                // キャンセルされた場合は処理を終了
+                return false;
             }
             catch
             {
-                // 接続失敗時、5秒後に再試行
-                await Task.Delay(5000);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return false;
+                }
+
+                try
+                {
+                    // 接続失敗時、5秒後に再試行（キャンセル可能）
+                    await Task.Delay(5000, cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    return false;
+                }
             }
         }
+
+        return false;
     }
 }
 

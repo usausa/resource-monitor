@@ -60,8 +60,9 @@ namespace Sandbox
             //    });
             //};
 
-            disposable = SignalRClient.Observe("http://127.0.0.1:9980/monitor", data =>
+            disposable = SignalRClient.Observe<MonitorValues>("http://127.0.0.1:9980/monitor", "Receive", data =>
             {
+                // TODO Disposed後のチェック
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     CpuControl.Value = data.CpuLoadTotal ?? 0;
