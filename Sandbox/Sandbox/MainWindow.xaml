@@ -24,7 +24,7 @@
             FontSize="14"
             GraphColor="#6993f0"
             Label="CPU used"
-            Value="29.1" />
+            Value="0" />
 
         <local:ResourceGraphControl
             x:Name="MemoryControl"
@@ -33,7 +33,7 @@
             FontSize="14"
             GraphColor="#69d0f0"
             Label="Memory used"
-            Value="45.2" />
+            Value="0" />
     </Grid>
 
 </Window>

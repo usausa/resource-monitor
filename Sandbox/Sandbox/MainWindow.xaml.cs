@@ -21,7 +21,9 @@ namespace Sandbox
 
         private readonly Random _random = new Random();
 
-        private readonly MonitorObserver observer = new();
+        private readonly IDisposable disposable;
+
+        //private readonly MonitorObserver observer = new();
 
         public MainWindow()
         {
@@ -48,12 +50,30 @@ namespace Sandbox
             //    0,
             //    500);
 
-            observer.Start();
-        }
+            //observer.Start("http://127.0.0.1:9980/monitor");
+            //observer.ValueChanged += data =>
+            //{
+            //    Application.Current.Dispatcher.Invoke(() =>
+            //    {
+            //        CpuControl.Value = data.CpuLoadTotal ?? 0;
+            //        MemoryControl.Value = data.MemoryLoadPhysical ?? 0;
+            //    });
+            //};
+
+            disposable = SignalRClient.Observe("http://127.0.0.1:9980/monitor", data =>
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    CpuControl.Value = data.CpuLoadTotal ?? 0;
+                    MemoryControl.Value = data.MemoryLoadPhysical ?? 0;
+                });
+            });
+            }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            observer.Stop();
+            disposable.Dispose();
+            //observer.Stop();
 
             _precisionTimer?.Dispose();
         }
