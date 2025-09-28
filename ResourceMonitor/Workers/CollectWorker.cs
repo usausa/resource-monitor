@@ -47,7 +47,7 @@ internal sealed class CollectWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(2000));
+        var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(1000));
         try
         {
             do

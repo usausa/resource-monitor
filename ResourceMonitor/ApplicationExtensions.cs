@@ -54,6 +54,7 @@ public static class ApplicationExtensions
     public static WebApplicationBuilder ConfigureComponents(this WebApplicationBuilder builder)
     {
         // TODO setting & processor & window size?
+        // TODO debug processor info
 
         // EventBus
         builder.Services.AddSingleton(EventBus.Default);
