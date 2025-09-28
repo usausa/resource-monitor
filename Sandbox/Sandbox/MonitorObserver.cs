@@ -50,9 +50,7 @@ internal static class ReactiveSignalR
             var cts = new CancellationTokenSource();
             disposable.Add(Disposable.Create(() => cts.Cancel()));
             // 接続処理とリトライロジックの実装
-            disposable.Add(Observable
-                .FromAsync(async () => await TryConnectWithRetryAsync(connection, retryInterval, cts.Token))
-                .Subscribe());
+            disposable.Add(Observable.FromAsync(async () => await TryConnectWithRetryAsync(connection, retryInterval, cts.Token)).Subscribe());
             // 接続のクリーンアップのための処理
             disposable.Add(Disposable.Create(async () =>
             {
