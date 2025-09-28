@@ -176,7 +176,6 @@ public sealed class StatControl : UserControl
             new SKPoint(0, 0),
             new SKPoint(width, 0),
             [skColor.WithAlpha(255), skColor.WithAlpha(192)], // TODO
-            [0.0f, 1.0f], // TODO remove ?
             SKShaderTileMode.Clamp);
         canvas.DrawRect(0, 0, width, height, backgroundPaint);
 
@@ -202,7 +201,6 @@ public sealed class StatControl : UserControl
             new SKPoint(0, 0),
             new SKPoint(0, height),
             [SKColors.White.WithAlpha(192), SKColors.White.WithAlpha(64)], // TODO
-            [0.0f, 1.0f], // TODO remove ?
             SKShaderTileMode.Clamp);
         canvas.DrawPath(wavePath, wavePaint);
 
