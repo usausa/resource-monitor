@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using System.Text;
 using System.Windows;
@@ -18,10 +19,6 @@ namespace Sandbox
     /// </summary>
     public partial class MainWindow : Window
     {
-        private System.Threading.Timer? _precisionTimer;
-
-        private readonly Random _random = new Random();
-
         private readonly IDisposable disposable;
 
         //private readonly MonitorObserver observer = new();
@@ -30,53 +27,25 @@ namespace Sandbox
         {
             InitializeComponent();
 
-            //_precisionTimer = new System.Threading.Timer(
-            //    state =>
-            //    {
-            //        // TODO stop or dispose
+            var cpuValues = new StatDataSet(101);
+            var memoryValues = new StatDataSet(101);
 
-            //        // Update the UI on the dispatcher thread
-            //        Application.Current.Dispatcher.Invoke(() =>
-            //        {
-            //            // Simulate CPU usage between 15-35%
-            //            double cpuValue = 15 + _random.NextDouble() * 75;
-            //            CpuControl.Value = (float)cpuValue;
+            CpuControl.DataSet = cpuValues;
+            MemoryControl.DataSet = memoryValues;
 
-            //            // Simulate memory usage between 30-60%
-            //            double memValue = 30 + _random.NextDouble() * 70;
-            //            MemoryControl.Value = (float)memValue;
-            //        });
-            //    },
-            //    null,
-            //    0,
-            //    500);
-
-            //observer.Start("http://127.0.0.1:9980/monitor");
-            //observer.ValueChanged += data =>
-            //{
-            //    Application.Current.Dispatcher.Invoke(() =>
-            //    {
-            //        CpuControl.Value = data.CpuLoadTotal ?? 0;
-            //        MemoryControl.Value = data.MemoryLoadPhysical ?? 0;
-            //    });
-            //};
-
-            disposable = SignalRClient.CreateObservable<MonitorValues>("http://127.0.0.1:9980/monitor", "Receive", TimeSpan.FromSeconds(5))
+            disposable = ReactiveSignalR.CreateObservable<MonitorValues>("http://127.0.0.1:9980/monitor", "Receive", TimeSpan.FromSeconds(5))
                     .ObserveOn(SynchronizationContext.Current!)
                     .Subscribe(data =>
                     {
-                        CpuControl.Value = data.CpuLoadTotal ?? 0;
-                        MemoryControl.Value = data.MemoryLoadPhysical ?? 0;
+                        cpuValues.Add(data.CpuLoadTotal ?? 0);
+                        memoryValues.Add(data.MemoryLoadPhysical ?? 0);
                     });
-
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             disposable.Dispose();
             //observer.Stop();
-
-            _precisionTimer?.Dispose();
         }
     }
 }
