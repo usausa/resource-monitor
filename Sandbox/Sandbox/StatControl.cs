@@ -49,6 +49,18 @@ public sealed class StatControl : UserControl
         set => SetValue(LabelProperty, value);
     }
 
+    public static readonly DependencyProperty UnitProperty = DependencyProperty.Register(
+        nameof(Unit),
+        typeof(string),
+        typeof(StatControl),
+        new PropertyMetadata("%", OnPropertyChanged));
+
+    public string Unit
+    {
+        get => (string)GetValue(UnitProperty);
+        set => SetValue(UnitProperty, value);
+    }
+
     public static readonly DependencyProperty MaxValueProperty = DependencyProperty.Register(
         nameof(MaxValue),
         typeof(float),
@@ -73,16 +85,28 @@ public sealed class StatControl : UserControl
         set => SetValue(DataSetProperty, value);
     }
 
-    public static readonly DependencyProperty ShowTooltipsProperty = DependencyProperty.Register(
-        nameof(ShowTooltips),
+    public static readonly DependencyProperty UseTooltipProperty = DependencyProperty.Register(
+        nameof(UseTooltip),
         typeof(bool),
         typeof(StatControl),
         new PropertyMetadata(true));
 
-    public bool ShowTooltips
+    public bool UseTooltip
     {
-        get => (bool)GetValue(ShowTooltipsProperty);
-        set => SetValue(ShowTooltipsProperty, value);
+        get => (bool)GetValue(UseTooltipProperty);
+        set => SetValue(UseTooltipProperty, value);
+    }
+
+    public static readonly DependencyProperty TooltipOffsetProperty = DependencyProperty.Register(
+        nameof(TooltipOffset),
+        typeof(Point),
+        typeof(StatControl),
+        new PropertyMetadata(new Point(8, -32)));
+
+    public Point TooltipOffset
+    {
+        get => (Point)GetValue(TooltipOffsetProperty);
+        set => SetValue(TooltipOffsetProperty, value);
     }
 
     //--------------------------------------------------------------------------------
@@ -102,7 +126,7 @@ public sealed class StatControl : UserControl
 
         tooltipText = new TextBlock
         {
-            Padding = new Thickness(5),
+            Padding = new Thickness(4, 2, 4, 2),
             Background = new SolidColorBrush(Color.FromArgb(225, 32, 32, 32)),
             Foreground = Brushes.White,
             FontSize = 12
@@ -175,7 +199,7 @@ public sealed class StatControl : UserControl
         backgroundPaint.Shader = SKShader.CreateLinearGradient(
             new SKPoint(0, 0),
             new SKPoint(width, 0),
-            [skColor.WithAlpha(255), skColor.WithAlpha(192)], // TODO
+            [skColor.WithAlpha(255), skColor.WithAlpha(192)],
             SKShaderTileMode.Clamp);
         canvas.DrawRect(0, 0, width, height, backgroundPaint);
 
@@ -200,7 +224,7 @@ public sealed class StatControl : UserControl
         wavePaint.Shader = SKShader.CreateLinearGradient(
             new SKPoint(0, 0),
             new SKPoint(0, height),
-            [SKColors.White.WithAlpha(192), SKColors.White.WithAlpha(64)], // TODO
+            [SKColors.White.WithAlpha(192), SKColors.White.WithAlpha(64)],
             SKShaderTileMode.Clamp);
         canvas.DrawPath(wavePath, wavePaint);
 
@@ -241,25 +265,27 @@ public sealed class StatControl : UserControl
         using var labelPaint = new SKPaint();
         labelPaint.Color = SKColors.White;
         labelPaint.IsAntialias = true;
-        canvas.DrawText(Label, 10, 20, new SKFont(SKTypeface.Default, 16), labelPaint);
+        canvas.DrawText(Label, 8, 16, new SKFont(SKTypeface.Default, 16), labelPaint);
 
         // TODO margin, font size
         // Value
         var currentValue = values.GetLastValue();
+        var unit = Unit;
+        var valueText = String.IsNullOrEmpty(unit) ? $"{currentValue:F1}" : $"{currentValue:F1} {unit}";
 
         using var valuePaint = new SKPaint();
         valuePaint.Color = SKColors.White;
         valuePaint.IsAntialias = true;
-        var valueText = currentValue.ToString("F1");
-        canvas.DrawText(valueText, width - 10, 30, SKTextAlign.Right, new SKFont(SKTypeface.Default, 24), valuePaint);
+        canvas.DrawText(valueText, width - 8, 24, SKTextAlign.Right, new SKFont(SKTypeface.Default, 24), valuePaint);
     }
 
     //--------------------------------------------------------------------------------
+    // Mouse
     //--------------------------------------------------------------------------------
 
     private void OnMouseMove(object sender, MouseEventArgs e)
     {
-        if (!ShowTooltips)
+        if (!UseTooltip)
         {
             return;
         }
@@ -277,6 +303,7 @@ public sealed class StatControl : UserControl
     }
 
     //--------------------------------------------------------------------------------
+    // Tooltip
     //--------------------------------------------------------------------------------
 
     private void UpdateTooltipPosition(Point position)
@@ -299,10 +326,12 @@ public sealed class StatControl : UserControl
 
     private void ShowTooltip(Point position, float value)
     {
-        tooltipText.Text = $"{value:F1}%";
+        var unit = Unit;
+        tooltipText.Text = String.IsNullOrEmpty(unit) ? $"{value:F1}" : $"{value:F1}{unit}";
 
-        tooltipPopup.HorizontalOffset = position.X + 10;
-        tooltipPopup.VerticalOffset = position.Y - 30;
+        var offset = TooltipOffset;
+        tooltipPopup.HorizontalOffset = position.X + offset.X;
+        tooltipPopup.VerticalOffset = position.Y + offset.Y;
 
         if (!isTooltipVisible)
         {

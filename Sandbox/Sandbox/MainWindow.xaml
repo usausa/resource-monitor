@@ -20,14 +20,12 @@
         <local:StatControl
             x:Name="CpuControl"
             Grid.Row="0"
-            Margin="4"
             GraphColor="#6993f0"
             Label="CPU used" />
 
         <local:StatControl
             x:Name="MemoryControl"
             Grid.Row="1"
-            Margin="4"
             GraphColor="#69d0f0"
             Label="Memory used" />
     </Grid>
