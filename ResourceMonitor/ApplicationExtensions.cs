@@ -1,23 +1,26 @@
 namespace ResourceMonitor;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 using ResourceMonitor.Events;
 using ResourceMonitor.Hubs;
 using ResourceMonitor.Processors;
+using ResourceMonitor.Settings;
 using ResourceMonitor.Views;
 using ResourceMonitor.Workers;
 
 using Serilog;
 
-public static class ApplicationExtensions
+internal static class ApplicationExtensions
 {
     //--------------------------------------------------------------------------------
     // Logging
     //--------------------------------------------------------------------------------
 
-    public static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder)
+    internal static WebApplicationBuilder ConfigureLogging(this WebApplicationBuilder builder)
     {
         builder.Logging.ClearProviders();
         builder.Services.AddSerilog(options =>
@@ -32,36 +35,52 @@ public static class ApplicationExtensions
     // API
     //--------------------------------------------------------------------------------
 
-    public static WebApplicationBuilder ConfigureApi(this WebApplicationBuilder builder)
+    internal static WebApplicationBuilder ConfigureApi(this WebApplicationBuilder builder, ProcessorOption option)
     {
-        builder.Services.AddSignalR();
+        if (option.EnableHub)
+        {
+            builder.Services.AddSignalR();
+        }
 
         return builder;
     }
 
-    public static void MapApi(this WebApplication app)
+    internal static void MapApi(this WebApplication app, ProcessorOption option)
     {
-        app.UseRouting();
+        if (option.EnableHub)
+        {
+            app.UseRouting();
 
-        app.MapHub<MonitorHub>("/monitor");
-        app.MapGet("/", () => "Resource monitor");
+            app.MapHub<MonitorHub>("/monitor");
+            app.MapGet("/", () => "Resource monitor");
+        }
     }
 
     //--------------------------------------------------------------------------------
     // Components
     //--------------------------------------------------------------------------------
 
-    public static WebApplicationBuilder ConfigureComponents(this WebApplicationBuilder builder)
+    internal static WebApplicationBuilder ConfigureComponents(this WebApplicationBuilder builder, ProcessorOption option)
     {
-        // TODO setting & processor & window size?
-        // TODO debug processor info
+        // Setting
+        builder.Services.Configure<MonitorSetting>(builder.Configuration.GetSection("Monitor"));
+        builder.Services.AddSingleton(p => p.GetRequiredService<IOptions<MonitorSetting>>().Value);
+        builder.Services.Configure<WindowSetting>(builder.Configuration.GetSection("Window"));
+        builder.Services.AddSingleton(p => p.GetRequiredService<IOptions<WindowSetting>>().Value);
 
         // EventBus
         builder.Services.AddSingleton(EventBus.Default);
 
         // Processors
         builder.Services.AddSingleton<IValueProcessor, EventBusValueProcessor>();
-        builder.Services.AddSingleton<IValueProcessor, HubValueProcessor>();
+        if (option.EnableHub)
+        {
+            builder.Services.AddSingleton<IValueProcessor, HubValueProcessor>();
+        }
+        if (option.EnableLog)
+        {
+            builder.Services.AddSingleton<IValueProcessor, LogValueProcessor>();
+        }
 
         // Workers
         builder.Services.AddHostedService<CollectWorker>();

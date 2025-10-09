@@ -6,10 +6,13 @@ using Microsoft.Extensions.Hosting;
 
 using ResourceMonitor.Models;
 using ResourceMonitor.Processors;
+using ResourceMonitor.Settings;
 
 internal sealed class CollectWorker : BackgroundService
 {
     private readonly ILogger<CollectWorker> log;
+
+    private readonly MonitorSetting setting;
 
     private readonly IValueProcessor[] processors;
 
@@ -19,12 +22,13 @@ internal sealed class CollectWorker : BackgroundService
 
     private readonly List<Action<MonitorValues>> collectActions = new();
 
-    // TODO setting : interval
     public CollectWorker(
         ILogger<CollectWorker> log,
+        MonitorSetting setting,
         IEnumerable<IValueProcessor> processors)
     {
         this.log = log;
+        this.setting = setting;
         this.processors = processors.ToArray();
 
         computer = new Computer
@@ -45,16 +49,14 @@ internal sealed class CollectWorker : BackgroundService
         computer.Close();
     }
 
+#pragma warning disable CA1031
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(1000));
+        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(setting.Interval));
         try
         {
             do
             {
-                // TODO
-                System.Diagnostics.Debug.WriteLine("*");
-
                 try
                 {
                     var values = new MonitorValues();
@@ -70,7 +72,7 @@ internal sealed class CollectWorker : BackgroundService
                     {
                         try
                         {
-                            await processor.ProcessAsync(values);
+                            await processor.ProcessAsync(values).ConfigureAwait(false);
                         }
                         catch (Exception ex)
                         {
@@ -90,6 +92,7 @@ internal sealed class CollectWorker : BackgroundService
             // Ignore
         }
     }
+#pragma warning restore CA1031
 
     //--------------------------------------------------------------------------------
     // Sensor
@@ -97,11 +100,10 @@ internal sealed class CollectWorker : BackgroundService
 
     private void SetupSensors()
     {
-        // TODO log ?
         var cpuLoadTotal = default(ISensor);
         foreach (var sensor in EnumerateSensors(HardwareType.Cpu, SensorType.Load))
         {
-            System.Diagnostics.Debug.WriteLine($"cpu.load : {sensor.Hardware?.Name} - {sensor.Name} - {sensor.Value}");
+            LogFindSensor("cpu.load", sensor);
             if (sensor.Name.Equals("CPU Total", StringComparison.OrdinalIgnoreCase))
             {
                 cpuLoadTotal = sensor;
@@ -110,13 +112,13 @@ internal sealed class CollectWorker : BackgroundService
 
         if (cpuLoadTotal is not null)
         {
-            collectActions.Add(x => x.CpuLoadTotal = cpuLoadTotal.Value);
+            collectActions.Add(x => x.CpuLoadTotal = cpuLoadTotal.Value ?? 0);
         }
 
         var cpuTemperaturePackage = default(ISensor);
         foreach (var sensor in EnumerateSensors(HardwareType.Cpu, SensorType.Temperature))
         {
-            System.Diagnostics.Debug.WriteLine($"cpu.temperature : {sensor.Hardware?.Name} - {sensor.Name} - {sensor.Value}");
+            LogFindSensor("cpu.temperature", sensor);
             if (sensor.Name.Equals("CPU Package", StringComparison.OrdinalIgnoreCase) || sensor.Name.Equals("Core (Tctl/Tdie)", StringComparison.OrdinalIgnoreCase))
             {
                 cpuTemperaturePackage = sensor;
@@ -125,13 +127,13 @@ internal sealed class CollectWorker : BackgroundService
 
         if (cpuTemperaturePackage is not null)
         {
-            collectActions.Add(x => x.CpuTemperaturePackage = cpuTemperaturePackage.Value);
+            collectActions.Add(x => x.CpuTemperaturePackage = cpuTemperaturePackage.Value ?? 0);
         }
 
         var cpuPowerPackage = default(ISensor);
         foreach (var sensor in EnumerateSensors(HardwareType.Cpu, SensorType.Power))
         {
-            System.Diagnostics.Debug.WriteLine($"cpu.power : {sensor.Hardware?.Name} - {sensor.Name} - {sensor.Value}");
+            LogFindSensor("cpu.power", sensor);
             if (sensor.Name.Equals("CPU Package", StringComparison.OrdinalIgnoreCase) || sensor.Name.Equals("Package", StringComparison.OrdinalIgnoreCase))
             {
                 cpuPowerPackage = sensor;
@@ -140,14 +142,14 @@ internal sealed class CollectWorker : BackgroundService
 
         if (cpuPowerPackage is not null)
         {
-            collectActions.Add(x => x.CpuPowerPackage = cpuPowerPackage.Value);
+            collectActions.Add(x => x.CpuPowerPackage = cpuPowerPackage.Value ?? 0);
         }
 
         var gpuLoadCore = default(ISensor);
         var gpuLoadMemory = default(ISensor);
         foreach (var sensor in EnumerateGpuSensors(SensorType.Load))
         {
-            System.Diagnostics.Debug.WriteLine($"gpu.load : {sensor.Hardware?.Name} - {sensor.Name} - {sensor.Value}");
+            LogFindSensor("gpu.load", sensor);
             if (sensor.Name.Equals("GPU Core", StringComparison.OrdinalIgnoreCase))
             {
                 gpuLoadCore = sensor;
@@ -160,17 +162,17 @@ internal sealed class CollectWorker : BackgroundService
 
         if (gpuLoadCore is not null)
         {
-            collectActions.Add(x => x.GpuLoadCore = gpuLoadCore.Value);
+            collectActions.Add(x => x.GpuLoadCore = gpuLoadCore.Value ?? 0);
         }
         if (gpuLoadMemory is not null)
         {
-            collectActions.Add(x => x.GpuLoadMemory = gpuLoadMemory.Value);
+            collectActions.Add(x => x.GpuLoadMemory = gpuLoadMemory.Value ?? 0);
         }
 
         var gpuTemperatureCore = default(ISensor);
         foreach (var sensor in EnumerateGpuSensors(SensorType.Temperature))
         {
-            System.Diagnostics.Debug.WriteLine($"gpu.temperature : {sensor.Hardware?.Name} - {sensor.Name} - {sensor.Value}");
+            LogFindSensor("gpu.temperature", sensor);
             if (sensor.Name.Equals("GPU Core", StringComparison.OrdinalIgnoreCase))
             {
                 gpuTemperatureCore = sensor;
@@ -179,13 +181,13 @@ internal sealed class CollectWorker : BackgroundService
 
         if (gpuTemperatureCore is not null)
         {
-            collectActions.Add(x => x.GpuTemperatureCore = gpuTemperatureCore.Value);
+            collectActions.Add(x => x.GpuTemperatureCore = gpuTemperatureCore.Value ?? 0);
         }
 
         var gpuPowerPackage = default(ISensor);
         foreach (var sensor in EnumerateGpuSensors(SensorType.Power))
         {
-            System.Diagnostics.Debug.WriteLine($"gpu.power : {sensor.Hardware?.Name} - {sensor.Name} - {sensor.Value}");
+            LogFindSensor("gpu.power", sensor);
             if (sensor.Name.Equals("GPU Package", StringComparison.OrdinalIgnoreCase))
             {
                 gpuPowerPackage = sensor;
@@ -194,14 +196,14 @@ internal sealed class CollectWorker : BackgroundService
 
         if (gpuPowerPackage is not null)
         {
-            collectActions.Add(x => x.GpuPowerPackage = gpuPowerPackage.Value);
+            collectActions.Add(x => x.GpuPowerPackage = gpuPowerPackage.Value ?? 0);
         }
 
         var gpuMemoryUsed = default(ISensor);
         var gpuMemoryTotal = default(ISensor);
         foreach (var sensor in EnumerateGpuSensors(SensorType.SmallData))
         {
-            System.Diagnostics.Debug.WriteLine($"gpu.memory : {sensor.Hardware?.Name} - {sensor.Name} - {sensor.Value}");
+            LogFindSensor("gpu.memory", sensor);
             if (sensor.Name.Equals("GPU Memory Used", StringComparison.OrdinalIgnoreCase))
             {
                 gpuMemoryUsed = sensor;
@@ -218,14 +220,14 @@ internal sealed class CollectWorker : BackgroundService
             {
                 var used = gpuMemoryUsed.Value;
                 var total = gpuMemoryTotal.Value;
-                x.GpuMemoryLoad = used.HasValue && total > 0 ? (used / total) * 100 : 0;
+                x.GpuMemoryLoad = (float)(used.HasValue && total > 0 ? (used / total) * 100 : 0);
             });
         }
 
         var memoryLoadPhysical = default(ISensor);
         foreach (var sensor in EnumerateSensors(HardwareType.Memory, SensorType.Load))
         {
-            System.Diagnostics.Debug.WriteLine($"memory : {sensor.Hardware?.Name} - {sensor.Name} - {sensor.Value}");
+            LogFindSensor("memory", sensor);
             if (sensor.Name.Equals("Memory", StringComparison.OrdinalIgnoreCase))
             {
                 memoryLoadPhysical = sensor;
@@ -234,8 +236,13 @@ internal sealed class CollectWorker : BackgroundService
 
         if (memoryLoadPhysical is not null)
         {
-            collectActions.Add(x => x.MemoryLoadPhysical = memoryLoadPhysical.Value);
+            collectActions.Add(x => x.MemoryLoadPhysical = memoryLoadPhysical.Value ?? 0);
         }
+    }
+
+    private void LogFindSensor(string category, ISensor sensor)
+    {
+        log.LogDebug("Find sensor. category=[{Category}], name=[{HardwareName} - {SensorName}], value=[{Value}]", category, sensor.Hardware?.Name, sensor.Name, sensor.Value);
     }
 
     //--------------------------------------------------------------------------------

@@ -31,6 +31,14 @@ internal static class Log
     public static void ErrorUnknownException(this ILogger logger, Exception ex) =>
         logger.LogError(ex, "Unknown exception.");
 
+    // Hub
+
+    public static void InfoConnectionConnected(this ILogger logger, string connectionId) =>
+        logger.LogInformation("Client connected: connectionId=[{connectionId}]", connectionId);
+
+    public static void InfoConnectionDisconnected(this ILogger logger, string connectionId) =>
+        logger.LogInformation("Client disconnected: connectionId=[{connectionId}]", connectionId);
+
 #pragma warning restore CA1848
 #pragma warning restore CA1727
 }

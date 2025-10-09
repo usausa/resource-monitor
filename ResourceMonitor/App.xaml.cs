@@ -4,9 +4,11 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using ResourceMonitor.Settings;
 using ResourceMonitor.Views;
 
 using Smart.Mvvm.Resolver;
@@ -50,17 +52,19 @@ public sealed partial class App
     {
         var builder = WebApplication.CreateBuilder(Environment.GetCommandLineArgs());
 
+        var option = builder.Configuration.GetRequiredSection("Processor").Get<ProcessorOption>()!;
+
         // Log
         builder.ConfigureLogging();
         // API
-        builder.ConfigureApi();
+        builder.ConfigureApi(option);
         // Components
-        builder.ConfigureComponents();
+        builder.ConfigureComponents(option);
 
         var app = builder.Build();
 
         // API
-        app.MapApi();
+        app.MapApi(option);
 
         return app;
     }
@@ -92,7 +96,6 @@ public sealed partial class App
         await host.StartAsync().ConfigureAwait(false);
 
         // Update
-        // TODO log & visual effect ?
         notifyIcon.Text = "Monitoring";
         MainWindow.Show();
     }
