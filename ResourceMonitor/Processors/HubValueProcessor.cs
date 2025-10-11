@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 using ResourceMonitor.Hubs;
 using ResourceMonitor.Models;
 
-internal sealed class HubValueProcessor : IValueProcessor
+public sealed class HubValueProcessor : IValueProcessor
 {
     private readonly IHubContext<MonitorHub> hubContext;
 

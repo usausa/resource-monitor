@@ -3,7 +3,7 @@ namespace ResourceMonitor.Processors;
 using ResourceMonitor.Events;
 using ResourceMonitor.Models;
 
-internal sealed class EventBusValueProcessor : IValueProcessor
+public sealed class EventBusValueProcessor : IValueProcessor
 {
     private readonly EventBus eventBus;
 

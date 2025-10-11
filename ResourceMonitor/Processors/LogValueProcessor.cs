@@ -2,7 +2,7 @@ namespace ResourceMonitor.Processors;
 
 using ResourceMonitor.Models;
 
-internal sealed class LogValueProcessor : IValueProcessor
+public sealed class LogValueProcessor : IValueProcessor
 {
     private readonly ILogger<LogValueProcessor> log;
 

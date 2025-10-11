@@ -19,7 +19,6 @@
 
     <i:Interaction.Behaviors>
         <behaviors:WindowPlacementBehavior Placement="TopRight" />
-        <s:DragMoveBehavior />
         <s:ContextMenuBehavior>
             <s:ContextMenuBehavior.Menu>
                 <ContextMenu>
@@ -28,8 +27,12 @@
                 </ContextMenu>
             </s:ContextMenuBehavior.Menu>
         </s:ContextMenuBehavior>
+        <s:DragMoveBehavior />
     </i:Interaction.Behaviors>
     <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closed">
+            <s:DataContextDisposeAction />
+        </i:EventTrigger>
         <s:EventRequestTrigger Request="{Binding HideRequest}">
             <s:EventRequestTrigger.Actions>
                 <s:CallMethodAction MethodName="Hide" />

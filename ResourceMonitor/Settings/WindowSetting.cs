@@ -1,6 +1,6 @@
 namespace ResourceMonitor.Settings;
 
-internal sealed class WindowSetting
+public sealed class WindowSetting
 {
     // TODO
 }

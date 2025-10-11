@@ -1,6 +1,6 @@
 namespace ResourceMonitor.Settings;
 
-internal sealed class ProcessorOption
+public sealed class ProcessorOption
 {
     public bool EnableHub { get; set; }
 

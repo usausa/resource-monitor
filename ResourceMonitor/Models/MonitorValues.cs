@@ -1,6 +1,6 @@
 namespace ResourceMonitor.Models;
 
-internal sealed class MonitorValues
+public sealed class MonitorValues
 {
     public float CpuLoadTotal { get; set; }
 

@@ -8,7 +8,7 @@ using ResourceMonitor.Models;
 using ResourceMonitor.Processors;
 using ResourceMonitor.Settings;
 
-internal sealed class CollectWorker : BackgroundService
+public sealed class CollectWorker : BackgroundService
 {
     private readonly ILogger<CollectWorker> log;
 
@@ -240,10 +240,12 @@ internal sealed class CollectWorker : BackgroundService
         }
     }
 
+#pragma warning disable CA1848
     private void LogFindSensor(string category, ISensor sensor)
     {
         log.LogDebug("Find sensor. category=[{Category}], name=[{HardwareName} - {SensorName}], value=[{Value}]", category, sensor.Hardware?.Name, sensor.Name, sensor.Value);
     }
+#pragma warning restore CA1848
 
     //--------------------------------------------------------------------------------
     // Helper
