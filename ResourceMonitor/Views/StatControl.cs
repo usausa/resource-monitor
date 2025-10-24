@@ -36,6 +36,54 @@ public sealed class StatControl : UserControl
         set => SetValue(GraphColorProperty, value);
     }
 
+    public static readonly DependencyProperty HeaderHeightProperty = DependencyProperty.Register(
+        nameof(HeaderHeight),
+        typeof(int),
+        typeof(StatControl),
+        new PropertyMetadata(32, OnPropertyChanged));
+
+    public int HeaderHeight
+    {
+        get => (int)GetValue(HeaderHeightProperty);
+        set => SetValue(HeaderHeightProperty, value);
+    }
+
+    public static readonly DependencyProperty HeaderPaddingProperty = DependencyProperty.Register(
+        nameof(HeaderPadding),
+        typeof(float),
+        typeof(StatControl),
+        new PropertyMetadata(4f, OnPropertyChanged));
+
+    public float HeaderPadding
+    {
+        get => (float)GetValue(HeaderPaddingProperty);
+        set => SetValue(HeaderPaddingProperty, value);
+    }
+
+    public static readonly DependencyProperty LabelFontSizeProperty = DependencyProperty.Register(
+        nameof(LabelFontSize),
+        typeof(float),
+        typeof(StatControl),
+        new PropertyMetadata(16f, OnPropertyChanged));
+
+    public float LabelFontSize
+    {
+        get => (float)GetValue(LabelFontSizeProperty);
+        set => SetValue(LabelFontSizeProperty, value);
+    }
+
+    public static readonly DependencyProperty ValueFontSizeProperty = DependencyProperty.Register(
+        nameof(ValueFontSize),
+        typeof(float),
+        typeof(StatControl),
+        new PropertyMetadata(24f, OnPropertyChanged));
+
+    public float ValueFontSize
+    {
+        get => (float)GetValue(ValueFontSizeProperty);
+        set => SetValue(ValueFontSizeProperty, value);
+    }
+
     public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(
         nameof(Label),
         typeof(string),
@@ -109,6 +157,7 @@ public sealed class StatControl : UserControl
     }
 
     //--------------------------------------------------------------------------------
+    // Constructor
     //--------------------------------------------------------------------------------
 
     public StatControl()
@@ -141,6 +190,7 @@ public sealed class StatControl : UserControl
     }
 
     //--------------------------------------------------------------------------------
+    // Event
     //--------------------------------------------------------------------------------
 
     private static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -185,6 +235,8 @@ public sealed class StatControl : UserControl
         var canvas = e.Surface.Canvas;
         var width = e.Info.Width;
         var height = e.Info.Height;
+        var statHeight = height - HeaderHeight;
+        var headerPadding = HeaderPadding;
 
         var values = DataSet;
         var pointWidth = (float)width / (values.Capacity - 1);
@@ -211,7 +263,7 @@ public sealed class StatControl : UserControl
         {
             var x = i * pointWidth;
             var normalizedValue = values.GetValue(i) / maxValueForScale;
-            var y = height - (normalizedValue * height * 0.7f);
+            var y = height - (normalizedValue * statHeight);
             wavePath.LineTo(x, y);
         }
 
@@ -230,12 +282,12 @@ public sealed class StatControl : UserControl
 
         // Line
         using var linePath = new SKPath();
-        linePath.MoveTo(0, height - (values.GetValue(0) / maxValueForScale * height * 0.7f)); // TODO
+        linePath.MoveTo(0, height - (values.GetValue(0) / maxValueForScale * statHeight));
 
         for (var i = 1; i < values.Capacity; i++)
         {
             var x = i * pointWidth;
-            var y = height - (values.GetValue(i) / maxValueForScale * height * 0.7f); // TODO
+            var y = height - (values.GetValue(i) / maxValueForScale * statHeight);
             linePath.LineTo(x, y);
         }
 
@@ -249,9 +301,8 @@ public sealed class StatControl : UserControl
         // Mouse point
         if (mouseHoverIndex >= 0)
         {
-            // TODO y
             var x = mouseHoverIndex * pointWidth;
-            var y = height - (values.GetValue(mouseHoverIndex) / maxValueForScale * height * 0.7f);
+            var y = height - (values.GetValue(mouseHoverIndex) / maxValueForScale * statHeight);
 
             using var pointPaint = new SKPaint();
             pointPaint.Style = SKPaintStyle.Fill;
@@ -260,14 +311,13 @@ public sealed class StatControl : UserControl
             canvas.DrawCircle(x, y, 3, pointPaint);
         }
 
-        // TODO margin, font size
         // Label
         using var labelPaint = new SKPaint();
         labelPaint.Color = SKColors.White;
         labelPaint.IsAntialias = true;
-        canvas.DrawText(Label, 8, 16, new SKFont(SKTypeface.Default, 16), labelPaint);
+        var labelFont = new SKFont(SKTypeface.Default, LabelFontSize);
+        canvas.DrawText(Label, headerPadding, Math.Abs(labelFont.Metrics.Ascent) - labelFont.Metrics.Descent + headerPadding, labelFont, labelPaint);
 
-        // TODO margin, font size
         // Value
         var currentValue = values.GetLastValue();
         var unit = Unit;
@@ -276,7 +326,8 @@ public sealed class StatControl : UserControl
         using var valuePaint = new SKPaint();
         valuePaint.Color = SKColors.White;
         valuePaint.IsAntialias = true;
-        canvas.DrawText(valueText, width - 8, 24, SKTextAlign.Right, new SKFont(SKTypeface.Default, 24), valuePaint);
+        var valueFont = new SKFont(SKTypeface.Default, ValueFontSize);
+        canvas.DrawText(valueText, width - headerPadding, Math.Abs(valueFont.Metrics.Ascent) - valueFont.Metrics.Descent + headerPadding, SKTextAlign.Right, valueFont, valuePaint);
     }
 
     //--------------------------------------------------------------------------------

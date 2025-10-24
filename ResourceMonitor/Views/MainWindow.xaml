@@ -55,12 +55,12 @@
 
         <views:StatControl Grid.Row="0"
                            DataSet="{Binding CpuLoadTotalSet}"
-                           GraphColor="#6993f0"
+                           GraphColor="#2196F3"
                            Label="CPU used" />
 
         <views:StatControl Grid.Row="1"
                            DataSet="{Binding GpuLoadCoreSet}"
-                           GraphColor="#69d0f0"
+                           GraphColor="#6993f0"
                            Label="GPU core" />
 
         <views:StatControl Grid.Row="2"
@@ -70,36 +70,36 @@
 
         <views:StatControl Grid.Row="3"
                            DataSet="{Binding MemoryLoadPhysicalSet}"
-                           GraphColor="#69d0f0"
+                           GraphColor="#009688"
                            Label="Memory used" />
 
         <views:StatControl Grid.Row="4"
                            DataSet="{Binding GpuMemoryLoadSet}"
-                           GraphColor="#6993f0"
+                           GraphColor="#00BCD4"
                            Label="GPU memory" />
 
         <views:StatControl Grid.Row="5"
                            DataSet="{Binding CpuTemperaturePackageSet}"
-                           GraphColor="#69d0f0"
+                           GraphColor="#F44336"
                            Label="CPU temp"
                            Unit="C" />
 
         <views:StatControl Grid.Row="6"
                            DataSet="{Binding GpuTemperatureCoreSet}"
-                           GraphColor="#6993f0"
+                           GraphColor="#F44336"
                            Label="GPU temp"
                            Unit="C" />
 
         <views:StatControl Grid.Row="7"
                            DataSet="{Binding CpuPowerPackageSet}"
-                           GraphColor="#69d0f0"
+                           GraphColor="#FF9800"
                            Label="CPU power"
                            MaxValue="200"
                            Unit="W" />
 
         <views:StatControl Grid.Row="8"
                            DataSet="{Binding GpuPowerPackageSet}"
-                           GraphColor="#6993f0"
+                           GraphColor="#FF9800"
                            Label="GPU power"
                            MaxValue="200"
                            Unit="W" />
