@@ -315,18 +315,18 @@ public sealed class StatControl : UserControl
         using var labelPaint = new SKPaint();
         labelPaint.Color = SKColors.White;
         labelPaint.IsAntialias = true;
-        var labelFont = new SKFont(SKTypeface.Default, LabelFontSize);
+        using var labelFont = new SKFont(SKTypeface.Default, LabelFontSize);
         canvas.DrawText(Label, headerPadding, Math.Abs(labelFont.Metrics.Ascent) - labelFont.Metrics.Descent + headerPadding, labelFont, labelPaint);
 
         // Value
-        var currentValue = values.GetLastValue();
+        var currentValue = values.LastValue;
         var unit = Unit;
         var valueText = String.IsNullOrEmpty(unit) ? $"{currentValue:F1}" : $"{currentValue:F1} {unit}";
 
         using var valuePaint = new SKPaint();
         valuePaint.Color = SKColors.White;
         valuePaint.IsAntialias = true;
-        var valueFont = new SKFont(SKTypeface.Default, ValueFontSize);
+        using var valueFont = new SKFont(SKTypeface.Default, ValueFontSize);
         canvas.DrawText(valueText, width - headerPadding, Math.Abs(valueFont.Metrics.Ascent) - valueFont.Metrics.Descent + headerPadding, SKTextAlign.Right, valueFont, valuePaint);
     }
 
