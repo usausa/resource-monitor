@@ -35,7 +35,7 @@ public sealed class MainWindowViewModel : ExtendViewModelBase
         CpuPowerPackageSet = new StatDataSet(101);
         GpuPowerPackageSet = new StatDataSet(101);
 
-        HideCommand = MakeDelegateCommand(() => HideRequest.Request());
+        HideCommand = MakeDelegateCommand(HideRequest.Request);
 
         Disposables.Add(Observable
             .FromEvent<Action<MonitorValues>, MonitorValues>(h => eventBus.Changed += h, h => eventBus.Changed -= h)

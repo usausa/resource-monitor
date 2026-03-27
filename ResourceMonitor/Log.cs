@@ -9,35 +9,35 @@ internal static class Log
     // Startup
 
     public static void InfoStartup(this ILogger logger) =>
-        logger.LogInformation("Application start.");
+        logger.LogInformation(message: "Application start.");
 
     public static void InfoStartupSettingsRuntime(this ILogger logger, string osDescription, string frameworkDescription, string runtimeIdentifier) =>
-        logger.LogInformation("Runtime: os=[{osDescription}], framework=[{frameworkDescription}], rid=[{runtimeIdentifier}]", osDescription, frameworkDescription, runtimeIdentifier);
+        logger.LogInformation(message: "Runtime: os=[{osDescription}], framework=[{frameworkDescription}], rid=[{runtimeIdentifier}]", args: [osDescription, frameworkDescription, runtimeIdentifier]);
 
     public static void InfoStartupSettingsGC(this ILogger logger, bool isServerGC, GCLatencyMode latencyMode, GCLargeObjectHeapCompactionMode largeObjectHeapCompactionMode) =>
-        logger.LogInformation("GCSettings: serverGC=[{isServerGC}], latencyMode=[{latencyMode}], largeObjectHeapCompactionMode=[{largeObjectHeapCompactionMode}]", isServerGC, latencyMode, largeObjectHeapCompactionMode);
+        logger.LogInformation(message: "GCSettings: serverGC=[{isServerGC}], latencyMode=[{latencyMode}], largeObjectHeapCompactionMode=[{largeObjectHeapCompactionMode}]", args: [isServerGC, latencyMode, largeObjectHeapCompactionMode]);
 
     public static void InfoStartupSettingsThreadPool(this ILogger logger, int workerThreads, int completionPortThreads) =>
-        logger.LogInformation("ThreadPool: workerThreads=[{workerThreads}], completionPortThreads=[{completionPortThreads}]", workerThreads, completionPortThreads);
+        logger.LogInformation(message: "ThreadPool: workerThreads=[{workerThreads}], completionPortThreads=[{completionPortThreads}]", args: [workerThreads, completionPortThreads]);
 
     public static void InfoStartupApplication(this ILogger logger, string application, Version? version) =>
-        logger.LogInformation("Application: application=[{application}], version=[{version}]", application, version);
+        logger.LogInformation(message: "Application: application=[{application}], version=[{version}]", args: [application, version]);
 
     public static void InfoStartupEnvironment(this ILogger logger, string environment, string contentRoot) =>
-        logger.LogInformation("Environment: environment=[{environment}], contentRoot=[{contentRoot}]", environment, contentRoot);
+        logger.LogInformation(message: "Environment: environment=[{environment}], contentRoot=[{contentRoot}]", args: [environment, contentRoot]);
 
     // Error
 
     public static void ErrorUnknownException(this ILogger logger, Exception ex) =>
-        logger.LogError(ex, "Unknown exception.");
+        logger.LogError(exception: ex, message: "Unknown exception.");
 
     // Hub
 
     public static void InfoConnectionConnected(this ILogger logger, string connectionId) =>
-        logger.LogInformation("Client connected: connectionId=[{connectionId}]", connectionId);
+        logger.LogInformation(message: "Client connected: connectionId=[{connectionId}]", args: connectionId);
 
     public static void InfoConnectionDisconnected(this ILogger logger, string connectionId) =>
-        logger.LogInformation("Client disconnected: connectionId=[{connectionId}]", connectionId);
+        logger.LogInformation(message: "Client disconnected: connectionId=[{connectionId}]", args: connectionId);
 
 #pragma warning restore CA1848
 #pragma warning restore CA1727

@@ -20,7 +20,7 @@ public sealed class CollectWorker : BackgroundService
 
     private readonly UpdateVisitor updateVisitor = new();
 
-    private readonly List<Action<MonitorValues>> collectActions = new();
+    private readonly List<Action<MonitorValues>> collectActions = [];
 
     public CollectWorker(
         ILogger<CollectWorker> log,
@@ -220,7 +220,7 @@ public sealed class CollectWorker : BackgroundService
             {
                 var used = gpuMemoryUsed.Value;
                 var total = gpuMemoryTotal.Value;
-                x.GpuMemoryLoad = (float)(used.HasValue && total > 0 ? (used / total) * 100 : 0);
+                x.GpuMemoryLoad = (float)(used.HasValue && total > 0 ? used / total * 100 : 0);
             });
         }
 

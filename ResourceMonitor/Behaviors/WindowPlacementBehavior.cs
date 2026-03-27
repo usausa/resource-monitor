@@ -1,8 +1,8 @@
 namespace ResourceMonitor.Behaviors;
 
-using Smart.Windows.Interactivity;
-
 using Microsoft.Xaml.Behaviors;
+
+using Smart.Windows.Interactivity;
 
 [TypeConstraint(typeof(Window))]
 public sealed class WindowPlacementBehavior : Behavior<Window>

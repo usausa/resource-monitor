@@ -196,7 +196,7 @@ public sealed class StatControl : UserControl
     private static void OnPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var control = (StatControl)d;
-        control.Dispatcher.InvokeAsync(() => control.skElement.InvalidateVisual(), DispatcherPriority.Render);
+        control.Dispatcher.InvokeAsync(control.skElement.InvalidateVisual, DispatcherPriority.Render);
     }
 
     private static void OnDataSetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
