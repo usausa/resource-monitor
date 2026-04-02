@@ -13,5 +13,5 @@
     <File Path="ResourceMonitor.sln.DotSettings" />
     <File Path="Settings.XamlStyler" />
   </Folder>
-  <Project Path="ResourceMonitor/ResourceMonitor.csproj" Id="bd736705-1ccf-4d9e-a829-94e97710fa43" />
+  <Project Path="ResourceMonitor/ResourceMonitor.csproj" />
 </Solution>
