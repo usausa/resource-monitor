@@ -37,10 +37,6 @@ public sealed class CollectWorker : BackgroundService
             IsGpuEnabled = true,
             IsMemoryEnabled = true
         };
-        computer.Open();
-        computer.Accept(updateVisitor);
-
-        SetupSensors();
     }
 
     public override void Dispose()
@@ -52,6 +48,11 @@ public sealed class CollectWorker : BackgroundService
 #pragma warning disable CA1031
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        computer.Open();
+        computer.Accept(updateVisitor);
+
+        SetupSensors();
+
         using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(setting.Interval));
         try
         {
