@@ -256,19 +256,20 @@ public sealed class StatControl : UserControl
         canvas.DrawRect(0, 0, width, height, backgroundPaint);
 
         // Path
-        using var wavePath = new SKPath();
-        wavePath.MoveTo(0, height);
+        using var wavePathBuilder = new SKPathBuilder();
+        wavePathBuilder.MoveTo(0, height);
 
         for (var i = 0; i < values.Capacity; i++)
         {
             var x = i * pointWidth;
             var normalizedValue = values.GetValue(i) / maxValueForScale;
             var y = height - (normalizedValue * statHeight);
-            wavePath.LineTo(x, y);
+            wavePathBuilder.LineTo(x, y);
         }
 
-        wavePath.LineTo(width, height);
-        wavePath.Close();
+        wavePathBuilder.LineTo(width, height);
+        wavePathBuilder.Close();
+        using var wavePath = wavePathBuilder.Detach();
 
         // Gradation
         using var wavePaint = new SKPaint();
@@ -281,16 +282,17 @@ public sealed class StatControl : UserControl
         canvas.DrawPath(wavePath, wavePaint);
 
         // Line
-        using var linePath = new SKPath();
-        linePath.MoveTo(0, height - (values.GetValue(0) / maxValueForScale * statHeight));
+        using var linePathBuilder = new SKPathBuilder();
+        linePathBuilder.MoveTo(0, height - (values.GetValue(0) / maxValueForScale * statHeight));
 
         for (var i = 1; i < values.Capacity; i++)
         {
             var x = i * pointWidth;
             var y = height - (values.GetValue(i) / maxValueForScale * statHeight);
-            linePath.LineTo(x, y);
+            linePathBuilder.LineTo(x, y);
         }
 
+        using var linePath = linePathBuilder.Detach();
         using var linePaint = new SKPaint();
         linePaint.Style = SKPaintStyle.Stroke;
         linePaint.Color = SKColors.White;
@@ -316,7 +318,7 @@ public sealed class StatControl : UserControl
         labelPaint.Color = SKColors.White;
         labelPaint.IsAntialias = true;
         using var labelFont = new SKFont(SKTypeface.Default, LabelFontSize);
-        canvas.DrawText(Label, headerPadding, Math.Abs(labelFont.Metrics.Ascent) - labelFont.Metrics.Descent + headerPadding, labelFont, labelPaint);
+        canvas.DrawText(Label, headerPadding, Math.Abs(labelFont.Metrics.Ascent) - labelFont.Metrics.Descent + headerPadding, SKTextAlign.Left, labelFont, labelPaint);
 
         // Value
         var currentValue = values.LastValue;
