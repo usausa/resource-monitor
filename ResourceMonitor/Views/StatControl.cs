@@ -13,6 +13,7 @@ using SkiaSharp.Views.WPF;
 
 public sealed class StatControl : UserControl
 {
+#pragma warning disable SA1214
     private static readonly Point MousePositonNone = new(-1, -1);
 
     private readonly SKElement skElement;
@@ -23,6 +24,7 @@ public sealed class StatControl : UserControl
     private readonly Popup tooltipPopup;
     private readonly TextBlock tooltipText;
     private bool isTooltipVisible;
+#pragma warning restore SA1214
 
     public static readonly DependencyProperty GraphColorProperty = DependencyProperty.Register(
         nameof(GraphColor),
@@ -364,7 +366,7 @@ public sealed class StatControl : UserControl
         var values = DataSet;
         var width = (float)skElement.ActualWidth;
         var index = (int)(position.X / width * values.Capacity);
-        if (index >= 0 && index < values.Capacity)
+        if ((index >= 0) && (index < values.Capacity))
         {
             mouseHoverIndex = index;
             ShowTooltip(position, values.GetValue(index));

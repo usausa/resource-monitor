@@ -221,7 +221,7 @@ public sealed class CollectWorker : BackgroundService
             {
                 var used = gpuMemoryUsed.Value;
                 var total = gpuMemoryTotal.Value;
-                x.GpuMemoryLoad = (float)(used.HasValue && total > 0 ? used / total * 100 : 0);
+                x.GpuMemoryLoad = (float)(used.HasValue && (total > 0) ? used / total * 100 : 0);
             });
         }
 
