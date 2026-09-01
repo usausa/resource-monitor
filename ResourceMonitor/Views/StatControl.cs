@@ -13,7 +13,6 @@ using SkiaSharp.Views.WPF;
 
 public sealed class StatControl : UserControl
 {
-#pragma warning disable SA1214
     private static readonly Point MousePositonNone = new(-1, -1);
 
     private readonly SKElement skElement;
@@ -24,7 +23,6 @@ public sealed class StatControl : UserControl
     private readonly Popup tooltipPopup;
     private readonly TextBlock tooltipText;
     private bool isTooltipVisible;
-#pragma warning restore SA1214
 
     public static readonly DependencyProperty GraphColorProperty = DependencyProperty.Register(
         nameof(GraphColor),
