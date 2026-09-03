@@ -29,7 +29,7 @@ public sealed class CollectWorker : BackgroundService
     {
         this.log = log;
         this.setting = setting;
-        this.processors = processors.ToArray();
+        this.processors = [.. processors];
 
         computer = new Computer
         {
