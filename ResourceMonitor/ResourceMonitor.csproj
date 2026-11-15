@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetFramework>net11.0-windows10.0.26100.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -17,7 +17,7 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.142" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.161" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
@@ -25,15 +25,15 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.1" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageReference Include="SkiaSharp" Version="4.151.1" />
-    <PackageReference Include="SkiaSharp.Views.WPF" Version="4.151.1" />
+    <PackageReference Include="SkiaSharp" Version="4.156.1" />
+    <PackageReference Include="SkiaSharp.Views.WPF" Version="4.156.1" />
     <PackageReference Include="System.Interactive" Version="7.0.1" />
     <PackageReference Include="System.Linq.Async" Version="7.0.1" />
     <PackageReference Include="System.Reactive" Version="7.0.0" />
-    <PackageReference Include="Usa.Smart.Core" Version="2.16.0" />
-    <PackageReference Include="Usa.Smart.Reactive" Version="2.15.0" />
-    <PackageReference Include="Usa.Smart.Windows" Version="2.26.0" />
-    <PackageReference Include="Usa.Smart.Windows.Extensions" Version="2.26.0" />
+    <PackageReference Include="Usa.Smart.Core" Version="3.0.0" />
+    <PackageReference Include="Usa.Smart.Reactive" Version="3.0.0" />
+    <PackageReference Include="Usa.Smart.Windows" Version="3.0.0" />
+    <PackageReference Include="Usa.Smart.Windows.Extensions" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,7 +57,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Usa.Smart.Analyzers.JapaneseComment" Version="1.10.0" />
+    <PackageReference Update="Usa.Smart.Analyzers.JapaneseComment" Version="2.0.0" />
   </ItemGroup>
 
 </Project>
